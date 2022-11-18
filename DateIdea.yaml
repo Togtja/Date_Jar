@@ -1,0 +1,62 @@
+ideas: 
+  - name: "To the Beach"
+    description: "We should go to beach either to just chill or take a swim <3"
+    tags: ["Warm", "Outdoors", "Outside"]
+    group: "Free"
+
+  - name: "Star gazing"
+    description: "Let's go out and look at the star together, make bring som hot chocolate"
+    tags: ["Late Night", "Outdoors", "Outside"]
+    group: "Free"
+
+  - name: "Frisbee Golf"
+    description: "Buy some Frisbees and throw them into a post thing"
+    tags: ["Outdoors", "Outside", "Activity"]
+    group: "Free"
+    
+  - name: "Orienteering"
+    description: "Walk/Run around in the forest looking for posts"
+    tags: ["Outdoors", "Outside", "Activity"]
+    group: "Free"
+
+
+###  Free
+#To the beach (Good weather, Warm, Outdoors, Outside)
+#Star gazing (Late Night, Winter, Outdoors, Outside)
+#Movie Night (LD, Indoors, Home)
+#Plan a trip we want to do (LD, Indoors, Home)
+#Baking (Indoors, Home)
+#Cooking something new (Indoors, Home)
+#Get Drunk->Mixing Drinks (Indoors, Home)
+#Slow Dancing (Indoors, Home)
+#Karaoke (Indoors, Home)
+#Play Video game together (LD, Indoors, Home)
+#Make Ice Cream (Indoors, Home)
+#
+#
+#### Affordable
+#Do DIY (Indoors, Home)
+#Date night at Affordable restaurant (Outdoors, Inside)
+#Go Rock Climbing (Outdoors, Inside)
+#Go to a museum (Outdoors, Inside)
+#Swimming (Outdoors, Inside)
+#Cinema (Outdoors, Inside)
+#Go Explore a City (Outdoors, Outside)
+#
+#
+#### Expensive
+#Go to an Event (Outdoors)
+#Play mini golf (Outdoors)
+#Bowling (Outdoors, Inside)
+#Lazer tag (Outdoors, Inside)
+#Paintball (Outdoors, Outside)
+#Get Photo Print out of some kind (Indoors, Home)
+#
+#### Very Expensive
+#Rock paper scissors (Outdoors)
+#Date night at fancy restaurant (Outdoors, Inside)
+#Take a class in something (Outdoors)
+#    Paiting
+#    Pottery
+#    Carpentry
+#    Something else
