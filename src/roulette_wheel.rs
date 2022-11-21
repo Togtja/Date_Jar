@@ -1,11 +1,13 @@
 
 
+use iced::alignment::{Horizontal, Vertical};
+use rand::Rng;
 use rand::seq::{SliceRandom, IteratorRandom};
 
 
 use iced::widget::{canvas};
 use iced::widget::canvas::{
-    Cache, Cursor, Geometry, Path
+    Cache, Cursor, Geometry, Path, Text
 };
 
 use crate::canvas::path::Arc;
@@ -36,7 +38,7 @@ pub struct RouletteWheel{
     rotation: f32,
     started_rotation: f32,
     progress: u32,
-    max_progress: u32,
+    max_progress: f32,
     date_ideas: Vec<DateIdea>,
 }
 
@@ -51,6 +53,8 @@ impl RouletteWheel {
     }
 
     const MAX_ROTATION: u32 = 360;
+    const ROTATION_SPEED: f32 = 10.0;
+    const PROGRESS_STEP: u32 = 1;
 
 }
 
@@ -87,26 +91,95 @@ impl <Message> canvas::Program<Message> for RouletteWheel {
         _cursor: Cursor,
     ) -> Vec<Geometry> {
         let roulette_wheel = self.cache.draw(bounds.size(), |frame| {
+
             let center = frame.center();
-            let radius = frame.width().min(frame.height()) / 2.0;
+            let radius = frame.width().min(frame.height()) / 2.5;
+
+            
             frame.translate(Vector::new(center.x, center.y));
-
-            frame.rotate(rotation(self.rotation, RouletteWheel::MAX_ROTATION as f32));
-
-
-            if self.date_ideas.len() > 0 {
-                for i in 0u32..self.date_ideas.len() as u32 {
-                    frame.fill(&divide_circle(i as f32,self.date_ideas.len() as f32, radius), COLORS[i as usize % COLORS.len()]);
-                    //frame.fill_text(text("Hello").into());
+            
+            frame.with_save(|frame|{
+                
+                frame.rotate(rotation(self.rotation, RouletteWheel::MAX_ROTATION as f32));
+                
+                let text = canvas::Text {
+                    horizontal_alignment: Horizontal::Center,
+                    vertical_alignment: Vertical::Top,
+                    size: 30.0,
+                    ..canvas::Text::default()
+                };
+                
+                if self.date_ideas.len() > 0 {
+                    for i in 0..self.date_ideas.len() {
+                        let name = &self.date_ideas[i].name;
+                        frame.fill(&divide_circle(i as f32,self.date_ideas.len() as f32, radius), COLORS[i % COLORS.len()]);
+                        
+                        let angle_size = 1.0 / self.date_ideas.len() as f32 * std::f32::consts::PI * 2.0;
+                        let x = radius/1.5 * (angle_size * (i as f32 + 0.5)).cos();
+                        let y = radius/1.5 * (angle_size * (i as f32 + 0.5)).sin();
+                        frame.with_save(|frame|{
+                        frame.fill_text(Text {
+                            content: name.to_string(),
+                            position: Point{
+                                x,
+                                y,
+                            },
+                            ..text
+                        });
+                    });
+                    
                     //frame.stroke(&divide_circle(i,20, radius), thin_stroke(COLORS[i as usize % COLORS.len()]));
                 }
             } 
             else{
                 frame.fill(&Path::circle(Point::ORIGIN, radius), Color::BLACK);
             }
-
+            
+            });
+            //Top
+            frame.with_save(|frame|{
+                let triangle_pointer =             Path::new(|p| {
+                    p.move_to(Point::new(3.0,  -radius -15.0));
+                    p.line_to(Point::new(-3.0,  -radius -15.0));
+                    p.line_to(Point::new(0.0,  -radius/1.2 - 15.0));
+                    p.line_to(Point::new(3.0,  -radius - 15.0));
+                });
+                frame.fill(&triangle_pointer, Color::BLACK);
+            });
+            /*
+            //Right
+            frame.with_save(|frame|{
+                let triangle_pointer =             Path::new(|p| {
+                    p.move_to(Point::new(radius + 15.0, 3.0 ));
+                    p.line_to(Point::new(radius + 15.0,  -3.0));
+                    p.line_to(Point::new(radius/1.2 + 15.0,  0.0));
+                    p.line_to(Point::new(radius + 15.0, 3.0 ));
+                });
+                frame.fill(&triangle_pointer, Color::BLACK);
+            });
+            //Bottom
+            frame.with_save(|frame|{
+                let triangle_pointer =             Path::new(|p| {
+                    p.move_to(Point::new(3.0,  radius + 15.0));
+                    p.line_to(Point::new(-3.0,  radius + 15.0));
+                    p.line_to(Point::new(0.0,  radius/1.2 + 15.0));
+                    p.line_to(Point::new(3.0,  radius + 15.0));
+                });
+                frame.fill(&triangle_pointer, Color::BLACK);
+            });
+            //Left
+            frame.with_save(|frame|{
+                let triangle_pointer =             Path::new(|p| {
+                    p.move_to(Point::new(-radius - 15.0, 3.0 ));
+                    p.line_to(Point::new(-radius - 15.0,  -3.0));
+                    p.line_to(Point::new(-radius/1.2 - 15.0,  0.0));
+                    p.line_to(Point::new(-radius - 15.0, 3.0 ));
+                });
+                frame.fill(&triangle_pointer, Color::BLACK);
+            });
+            */
         });
-
+        
         vec![roulette_wheel]
     }
 
@@ -136,7 +209,17 @@ impl IdeaPickerAnimated for RouletteWheel {
                 //TODO: trixy ludo to set correct max progress
                 // predicted + 360/self.date_ideas.len() * i
                 self.started_rotation = self.rotation;
-                self.max_progress = RouletteWheel::MAX_ROTATION * 3 + 180;
+                let idea_size_rot = RouletteWheel::MAX_ROTATION as f32 / self.date_ideas.len() as f32;
+                let num = rand::thread_rng().gen_range(0.0..idea_size_rot);
+                let wanted_pos = RouletteWheel::MAX_ROTATION as f32/ self.date_ideas.len() as f32 * i as f32 + num;
+                println!("wanted stop at {}", wanted_pos);
+                //Prediction
+                let rot_prog_ratio = RouletteWheel::ROTATION_SPEED/RouletteWheel::PROGRESS_STEP as f32;
+                let end_rot = (RouletteWheel::MAX_ROTATION as f32 / 2.0) - (0.5 * RouletteWheel::PROGRESS_STEP as f32);
+
+                self.max_progress = (wanted_pos - self.started_rotation) / rot_prog_ratio - end_rot + 2.0*RouletteWheel::MAX_ROTATION as f32;
+                println!("max progress {}=({} {})/{} - {} + 360", self.max_progress, wanted_pos, self.started_rotation, rot_prog_ratio, end_rot);
+
             }
             _ => {}
         }
@@ -149,16 +232,15 @@ impl IdeaPickerAnimated for RouletteWheel {
     }
 
     fn progress_animation(&mut self, _progress: u32) {
-        const ROTATION_SPEED: f32 = 10.0;
-        const PROGRESS_STEP: u32 = 1;
-        self.progress += PROGRESS_STEP;
+        self.progress += RouletteWheel::PROGRESS_STEP;
         //self.rotation += ROTATION_SPEED;
         
-        if self.progress < self.max_progress - RouletteWheel::MAX_ROTATION {
-            self.rotation += ROTATION_SPEED;
-        }else{
-            let progress_left = (self.max_progress - self.progress) as f32 / RouletteWheel::MAX_ROTATION as f32; // This moves us 175/progress_step * ROTATION:SPEED?
-            self.rotation += ROTATION_SPEED * progress_left;
+        if (self.progress as f32) < (self.max_progress - RouletteWheel::MAX_ROTATION as f32) {
+            self.rotation += RouletteWheel::ROTATION_SPEED;
+        }
+        else{
+            let progress_left = (self.max_progress - self.progress as f32) / RouletteWheel::MAX_ROTATION as f32; // This moves us 175/progress_step * ROTATION:SPEED?
+            self.rotation += RouletteWheel::ROTATION_SPEED * progress_left;
         }
         
         
@@ -166,15 +248,14 @@ impl IdeaPickerAnimated for RouletteWheel {
             self.rotation = self.rotation - RouletteWheel::MAX_ROTATION as f32;
         }
         
-        if self.max_progress <= self.progress {
-            let rot_prog_ratio = ROTATION_SPEED/PROGRESS_STEP as f32;
-            
-            let basic_rot = (self.max_progress - RouletteWheel::MAX_ROTATION) as f32;
-            let end_rot = (RouletteWheel::MAX_ROTATION as f32 / 2.0) - (0.5 * PROGRESS_STEP as f32);
-            let predicted = self.started_rotation + (rot_prog_ratio * (basic_rot + end_rot));
-            let predicted_rot = predicted - (predicted / RouletteWheel::MAX_ROTATION as f32).floor() *  RouletteWheel::MAX_ROTATION as f32;
-
-            println!("Stopped at {}, predicted stop at {}={}+{}+{}-{}", self.rotation, predicted_rot, self.started_rotation, basic_rot, end_rot, (predicted / RouletteWheel::MAX_ROTATION as f32).floor() *  RouletteWheel::MAX_ROTATION as f32);
+        if self.max_progress <= self.progress as f32 {
+            if self.rotation - self.rotation.floor() >= 0.1{
+                self.rotation = self.rotation.ceil();
+            }
+            else{
+                self.rotation = self.rotation.floor();
+            }
+            println!("Stopped at {} {}", self.rotation, self.progress);
             self.state = AnimationState::Finished;
         }
     }
@@ -185,7 +266,7 @@ impl IdeaPickerAnimated for RouletteWheel {
 
     fn get_animation_length(&self) -> u32 {
         //TODO: Random max so that it stops on the idea we want
-        return RouletteWheel::MAX_ROTATION * 3;
+        return self.max_progress.round() as u32;
     }
 }
 
@@ -198,8 +279,8 @@ fn rotation(n: f32, total: f32) -> f32 {
 
 fn divide_circle(n: f32, total: f32, radius: f32) -> Path{
     let angle_size = 1.0 / total * std::f32::consts::PI * 2.0;
-    let x = radius * (angle_size * n as f32).cos();
-    let y = radius * (angle_size * n as f32).sin();
+    let y = radius * (angle_size * n as f32).cos();
+    let x = radius * (angle_size * n as f32).sin();
      Path::new(|p| {
         p.move_to(Point::ORIGIN);
         p.line_to(Point::new(x,  y));
@@ -207,7 +288,7 @@ fn divide_circle(n: f32, total: f32, radius: f32) -> Path{
             center: Point::ORIGIN,
             radius,
             start_angle: angle_size * n ,
-            end_angle:   angle_size * (n+ 1.0),
+            end_angle:   angle_size * (n- 1.0),
         });
         p.line_to(Point::ORIGIN);
     })

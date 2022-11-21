@@ -18,11 +18,14 @@ ideas:
     description: "Walk/Run around in the forest looking for posts"
     tags: ["Outdoors", "Outside", "Activity"]
     group: "Free"
+  
+  #- name: "Movie Night"
+  #  description: "Chill at home an watch a movie"
+  #  tags: ["LD", "Indoors", "Home"]
+  #  group: "Free"
 
 
 ###  Free
-#To the beach (Good weather, Warm, Outdoors, Outside)
-#Star gazing (Late Night, Winter, Outdoors, Outside)
 #Movie Night (LD, Indoors, Home)
 #Plan a trip we want to do (LD, Indoors, Home)
 #Baking (Indoors, Home)
