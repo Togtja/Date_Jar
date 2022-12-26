@@ -68,7 +68,6 @@ impl IdeaPicker for RouletteWheel {
     }
 
     fn pick_idea(&self) -> (&DateIdea, usize) {
-        //TODO: Actually pick a random Idea
         let i = *(0..self.date_ideas.len()).choose(&mut rand::thread_rng()).get_or_insert(0) as usize;
 
         return (&self.ideas_ref()[i], i)
@@ -119,7 +118,7 @@ impl <Message> canvas::Program<Message> for RouletteWheel {
                         let y = radius/1.5 * (angle_size * (i as f32 + 0.5)).sin();
                         frame.with_save(|frame|{
                         frame.fill_text(Text {
-                            content: name.to_string(),
+                            content: i.to_string() + &name.to_string(),
                             position: Point{
                                 x,
                                 y,
@@ -197,10 +196,12 @@ impl IdeaPickerAnimated for RouletteWheel {
     fn get_animation_state(&self) -> &AnimationState {
         return &self.state
     }
-
     fn start(&mut self) {
         match self.state {
             AnimationState::Idle | AnimationState::Finished =>{
+                if self.ideas_ref().len() == 0{
+                    return;
+                }
                 self.progress = 0;
                 self.state = AnimationState::Running;
 

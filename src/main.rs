@@ -9,22 +9,17 @@ use iced::{
     Subscription, Point, Vector, mouse, Command
 };
 
-use iced::widget::canvas::{
-    Cache
-};
-
-
 
 mod constants;
 mod dateidea;
 mod idea_picker;
 mod roulette_wheel;
 mod deck_of_cards;
+mod tag_checkbox;
 
 use crate::deck_of_cards::DeckOfCards;
 use crate::idea_picker::{
     IdeaPickerAnimated,
-    IdeaPicker,
     AnimationState,
     Message,
     DynCanvasProgram
@@ -36,17 +31,31 @@ use crate::roulette_wheel::RouletteWheel;
 
 
 struct DateJar{
-    data: String,
     date_ideas: dateidea::DateIdeas,
     animation: Box<dyn IdeaPickerAnimated<State = ()>>,
+    tags: Vec<tag_checkbox::TagCheckbox>,
 }
 
 impl DateJar{
     pub fn new(ideas: dateidea::DateIdeas, animation: Box<dyn IdeaPickerAnimated<State = ()>>) -> Self {
+        let mut tags = Vec::new();
+        for mut idea in ideas.ideas.clone() {
+            tags.append(&mut idea.tags);
+        }
+        //Sort and remove consecutive duplicates
+        tags.sort_unstable();
+        tags.dedup();
+
+        let mut checkbox_tags = Vec::new();
+        for tag in tags{
+            let task = tag_checkbox::TagCheckbox::new(tag);
+            checkbox_tags.push(task);
+        }
+
         DateJar {
-            data: "".to_string(),
             date_ideas: ideas,
             animation,
+            tags: checkbox_tags,
         }
     }
 }
@@ -66,6 +75,7 @@ impl Application for DateJar {
     type Flags = ();
 
     fn new(_flags: ()) -> (Self, Command<Message>) {
+        //TODO: make a function to read dateideas from yaml files
         (
             DateJar::new(dateidea::get_data_idea("DateIdea.yaml".to_string()), Box::new(RouletteWheel::new())),
             Command::none(),
@@ -78,14 +88,43 @@ impl Application for DateJar {
 
     fn update(&mut self, message: Message) -> Command<Message>{
         match message {
+            Message::UpdateTags(i, taskm, ) =>{
+                if let Some(tag) = self.tags.get_mut(i) {
+                    tag.update(taskm);
+                }
+
+                self.animation.ideas_mut().clear();
+
+                let mut tags = Vec::new();
+
+                for t_tag in &self.tags {
+                    if !t_tag.in_use_ref() {
+                        continue;
+                    }
+                    tags.push(t_tag.get_name_ref());
+                }
+                
+                for i in self.date_ideas.ideas.clone(){
+                    let mut has_tag = true;
+
+                    for tag in &tags {
+                        if !i.tags.contains(tag) {
+                            has_tag = false;
+                            break;
+                        }
+                    }
+            
+                    if has_tag && !self.animation.ideas_ref().contains(&i){
+                        self.animation.ideas_mut().push(i);
+                    }
+
+                }
+                self.animation.get_cache().clear();
+            }
+
             Message::StartSpin => {
                 //TODO: Take the needed Idea
                 //self.random_animations.ideas().append(&mut self.date_ideas.ideas);
-                self.animation.ideas_mut().clear();
-                for i in self.date_ideas.ideas.clone(){
-                    self.animation.ideas_mut().push(i);
-                }
-                self.animation.get_cache().clear();
                 self.animation.start();
 
                 //data.truncate(100);
@@ -122,10 +161,24 @@ impl Application for DateJar {
             );
             
         let spin_button = button("Spin").padding(10).on_press(Message::StartSpin);
+        let tags = column(
+            self.tags
+            .iter()
+            .enumerate()
+            .map(|(i, tag)| {
+                tag.view().map(move |message|{
+                    Message::UpdateTags(i, message)
+                })
+            })
+            .collect()
+        )
+        .spacing(10);
         //let spin_button = button("Spin").padding(10).on_press(Message::StartSpin);
+        //let filtered_tags =
+        //    self.tags.iter().filter(|tags| filter.matches(tags));
 
-        let content = Column::new().align_items(Alignment::Center).spacing(20).push(spin_button).push(canvas);
-
+        let spinny = Column::new().align_items(Alignment::Center).spacing(20).push(spin_button).push(canvas);
+        let content = row![tags, spinny];
         container(content)
             .width(Length::Fill)
             .height(Length::Fill)

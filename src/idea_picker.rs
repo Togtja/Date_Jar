@@ -7,6 +7,7 @@ use iced::widget::{canvas};
 use crate::dateidea::{
     DateIdea
 };
+use crate::tag_checkbox::TaskMessage;
 
 
 
@@ -25,6 +26,7 @@ pub enum Message {
     StartSpin,
     Animate(u32),
     NewDateIdea(DateIdea),
+    UpdateTags(usize, TaskMessage),
 }
 
 pub trait IdeaPicker: canvas::Program<Message>{

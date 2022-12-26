@@ -6,7 +6,7 @@ publish = false
 
 
 [dependencies]
-iced = { git = "https://github.com/iced-rs/iced.git", features = ["canvas","tokio", "debug" ] }
+iced = { git = "https://github.com/iced-rs/iced.git", features = ["canvas", "tokio", "debug" ] }
 iced_native = { git = "https://github.com/iced-rs/iced.git" }
 web-sys = "0.3.60"
 serde = { version = "1.0", features = ["derive"] }

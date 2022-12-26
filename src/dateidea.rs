@@ -5,7 +5,7 @@ use serde_yaml;
 pub struct DateIdeas {
     pub ideas: Vec<DateIdea>,
 }
-#[derive(Deserialize, Debug, Clone, Hash)]
+#[derive(Deserialize, Debug, Clone, Hash, PartialEq)]
 pub struct DateIdea{
     pub name: String,
     pub description: String,

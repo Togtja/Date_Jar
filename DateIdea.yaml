@@ -19,22 +19,56 @@ ideas:
     tags: ["Outdoors", "Outside", "Activity"]
     group: "Free"
   
-  #- name: "Movie Night"
-  #  description: "Chill at home an watch a movie"
-  #  tags: ["LD", "Indoors", "Home"]
-  #  group: "Free"
+  - name: "Movie Night"
+    description: "Chill at home an watch a movie"
+    tags: ["LD", "Indoors", "Home"]
+    group: "Free"
+
+  - name: "Plan a trip"
+    description: "Plan a trip that we want to do"
+    tags: ["LD", "Indoors", "Home"]
+    group: "Free"
+
+  - name: "Plan a trip"
+    description: "Plan a trip that we want to do"
+    tags: ["LD", "Indoors", "Home"]
+    group: "Free"
+  
+  - name: "Baking"
+    description: "Lets bake something"
+    tags: ["Indoors", "Home"]
+    group: "Free"
+
+  - name: "Cook something new"
+    description: "Let us cook something we have not cooked before (or long time since)"
+    tags: ["Indoors", "Home"]
+    group: "Free"
+
+  - name: "Mixing Drinks"
+    description: "Let's get drunk and mix some drinks, and maybe put on a movie"
+    tags: ["Indoors", "Home"]
+    group: "Free"
+
+  - name: "Karaoke"
+    description: "Let's sing our hearts out, pairs well with some drinks"
+    tags: ["Indoors", "Home"]
+    group: "Free"
+
+  - name: "Play Video game together"
+    description: "Let's play something together gamer GF"
+    tags: ["LD", "Indoors", "Home"]
+    group: "Free"
+
+  - name: "Make Ice Cream"
+    description: "Let's make some ice-cream"
+    tags: ["Indoors", "Home"]
+    group: "Free"
+
+
 
 
 ###  Free
-#Movie Night (LD, Indoors, Home)
-#Plan a trip we want to do (LD, Indoors, Home)
-#Baking (Indoors, Home)
-#Cooking something new (Indoors, Home)
-#Get Drunk->Mixing Drinks (Indoors, Home)
 #Slow Dancing (Indoors, Home)
-#Karaoke (Indoors, Home)
-#Play Video game together (LD, Indoors, Home)
-#Make Ice Cream (Indoors, Home)
 #
 #
 #### Affordable
